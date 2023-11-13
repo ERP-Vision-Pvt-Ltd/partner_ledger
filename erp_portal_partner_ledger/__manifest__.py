@@ -7,7 +7,7 @@
     'category': 'portal',
     'website': 'https://www.erpvision.pk',
     'license': 'LGPL-3',
-    'depends': ['account_accountant', 'website'],
+    'depends': ['account'],
     'data': [
         'views/partner_ledger.xml'],
     'installable': True,

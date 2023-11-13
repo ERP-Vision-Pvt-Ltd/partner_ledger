@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <template id="portal_my_home_partner_ledger" name="Show ledger" inherit_id="portal.portal_my_home"
+              customize_show="True" priority="60">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Partner Ledger</t>
+                <t t-set="url" t-value="'/my/ledger'"/>
+                <t t-set="placeholder_count" t-value="'ledger_invo'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <record id="action_report_portal_ledger" model="ir.actions.report">
+        <field name="name">Partner Ledger</field>
+        <field name="model">account.move.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">erp_portal_partner_ledger.user_ledger_template</field>
+        <field name="report_file">erp_portal_partner_ledger.user_ledger_template</field>
+        <field name="binding_model_id" ref="model_account_move_line"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_print" model="ir.actions.report">
+        <field name="name">Partner Ledger print</field>
+        <field name="model">account.move.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">erp_portal_partner_ledger.user_ledger_print</field>
+        <field name="report_file">erp_portal_partner_ledger.user_ledger_print</field>
+        <field name="binding_model_id" ref="model_account_move_line"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+    <template id="portal_my_ledger" name="My ledger Invoice">
+        <t t-call="portal.portal_layout">
+            <style>
+                .hoverable-row {
+
+                cursor: pointer;
+                }
+
+                .hoverable-row:hover {
+                background-color: #CCCCCC;
+                transition: background-color 0.3s;
+                }
+            </style>
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">partner ledger</t>
+            </t>
+
+            <a href="/my/ledger/download" class="fa fa-download">Download</a><span></span>
+            <a href="/my/ledger/print" class="fa fa-print">Print</a>
+            <h2 style="margin-left:1%;color:#3665B0;text-align:center">Partner Ledger!</h2>
+            <!-- Informations -->
+            <div id="informations">
+                <br/>
+                <div class="row" style="margin-left:1%">
+                    <div class="col-lg-12">
+                        <strong class="d-block mb-1">Name:</strong>
+                        <span t-esc="partner.name"/>
+
+                    </div>
+                    <div class="col-lg-4" style="margin-top:10px">
+                        <strong class="d-block mb-1">Total Receivable:</strong>
+                        <span t-esc="partner.debit"/>
+                    </div>
+                    <div class="col-lg-4" style="margin-top:10px">
+                        <strong class="d-block mb-1">Total Payable:</strong>
+                        <span t-esc="partner.credit"/>
+                    </div>
+                    <div class="col-lg-4" style="margin-top:10px">
+                        <strong class="d-block mb-1">Net Balance:</strong>
+                        <span t-esc="partner.debit-partner.credit"/>
+                    </div>
+                </div>
+            </div>
+
+            <t t-if="ledger" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Date</th>
+                        <th>Document</th>
+                        <th>Ref</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Amount</th>
+                        <th>Matching no.</th>
+
+                    </tr>
+                </thead>
+                <t t-foreach="ledger" t-as="led">
+
+                    <tr>
+                        <td>
+                            <t t-if="led.date">
+                                <span t-field="led.date"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+                        <td>
+                            <t t-if="led.journal_id">
+                                <span t-field="led.journal_id.name"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+                        <td>
+                            <t t-if="led.move_name">
+                                <span t-field="led.move_name"/>
+                            </t>
+                        </td>
+
+                        <td>
+                            <t t-if="led.debit">
+                                <span t-field="led.debit"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+                        <td>
+                            <t t-if="led.credit">
+                                <span t-field="led.credit"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+
+                        <td>
+                            <t t-if="led.amount_currency">
+                                <span t-field="led.amount_currency"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+                        <td>
+                            <t t-if="led.matching_number">
+                                <span t-field="led.matching_number"/>
+                            </t>
+                            <t t-else=""></t>
+                        </td>
+
+
+                    </tr>
+                </t>
+            </t>
+            <p t-else="">There is currently no partner ledger for your account.</p>
+
+        </t>
+    </template>
+
+
+    <template id="user_ledger_template" name="user ledger Invoice">
+        <t t-call="portal.portal_layout">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <tbody>
+                        <center>
+                            <b>
+                                <h1>Partner Ledger</h1>
+                            </b>
+                        </center>
+                        <br></br>
+                        <br></br>
+
+
+                        <div class="col-lg-12">
+                            <strong>Name:</strong>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span t-esc="docs.partner_id.display_name"/>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <strong>Total Receivable:</strong>
+                            <span t-esc="docs.partner_id.debit"/>
+                        </div>
+                        <div class="col-lg-12">
+                            <strong>Total Payable:</strong>
+                            <span t-esc="docs.partner_id.credit"/>
+                        </div>
+                        <div class="col-lg-12">
+                            <strong>Net Balance:</strong>
+                            <span t-esc="docs.partner_id.debit - docs.partner_id.credit"/>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr class="active">
+                                    <th style="text-align: left;">Date</th>
+                                    <th style="text-align: left;">Document</th>
+                                    <th style="text-align: left;">Ref</th>
+                                    <th style="text-align: left;">Debit</th>
+                                    <th style="text-align: left;">Credit</th>
+                                    <th style="text-align: left;">Amount</th>
+                                    <th style="text-align: left;">Matching no.</th>
+                                </tr>
+                            </thead>
+                            <t t-foreach="docs" t-as="o">
+                                <tr>
+                                    <td>
+                                        <t t-if="o.date">
+                                            <span t-field="o.date"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.journal_id.name">
+                                            <span t-field="o.journal_id.name"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.move_name">
+                                            <span t-field="o.move_name"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.debit">
+                                            <span t-field="o.debit"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.credit">
+                                            <span t-field="o.credit"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.amount_currency">
+                                            <span t-field="o.amount_currency"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.matching_number">
+                                            <span t-field="o.matching_number"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+
+                                </tr>
+                            </t>
+
+                        </table>
+                    </tbody>
+                </div>
+            </t>
+        </t>
+
+
+    </template>
+
+
+    <template id="user_ledger_print" name="user ledger Invoice">
+        <t t-call="portal.portal_layout">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <tbody>
+                        <center>
+                            <b>
+                                <h1>Partner Ledger</h1>
+                            </b>
+                        </center>
+                        <br></br>
+                        <br></br>
+
+
+                        <div class="col-lg-12">
+                            <strong>Name:</strong>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span t-esc="docs.partner_id.display_name"/>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <strong>Total Receivable:</strong>
+                            <span t-esc="docs.partner_id.debit"/>
+                        </div>
+                        <div class="col-lg-12">
+                            <strong>Total Payable:</strong>
+                            <span t-esc="docs.partner_id.credit"/>
+                        </div>
+                        <div class="col-lg-12">
+                            <strong>Net Balance:</strong>
+                            <span t-esc="docs.partner_id.debit - docs.partner_id.credit"/>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr class="active">
+                                    <th style="text-align: left;">Date</th>
+                                    <th style="text-align: left;">Document</th>
+                                    <th style="text-align: left;">Ref</th>
+                                    <th style="text-align: left;">Debit</th>
+                                    <th style="text-align: left;">Credit</th>
+                                    <th style="text-align: left;">Amount</th>
+                                    <th style="text-align: left;">Matching no.</th>
+                                </tr>
+                            </thead>
+                            <t t-foreach="docs" t-as="o">
+                                <tr>
+                                    <td>
+                                        <t t-if="o.date">
+                                            <span t-field="o.date"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.journal_id.name">
+                                            <span t-field="o.journal_id.name"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.move_name">
+                                            <span t-field="o.move_name"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.debit">
+                                            <span t-field="o.debit"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.credit">
+                                            <span t-field="o.credit"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.amount_currency">
+                                            <span t-field="o.amount_currency"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+                                    <td>
+                                        <t t-if="o.matching_number">
+                                            <span t-field="o.matching_number"/>
+                                        </t>
+                                        <t t-else=""></t>
+                                    </td>
+
+                                </tr>
+                            </t>
+
+                        </table>
+                    </tbody>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
